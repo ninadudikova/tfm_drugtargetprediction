@@ -13,26 +13,34 @@
 # Desde la terminal he instalado los paquetes requests y pandas
 #   requests: hace llamadas a APIs externas
 #   pandas: manejo de datos
+#   zipfile: extracción de archivos comprimidos
 # Una vez instalados los paquetes, los cargo en memoria:
 
+import zipfile
 import pandas as pd
 import requests
 import time
 
-# Como paso previo he descargado manualmente el archivo drugbank_targets_protein.fasta de DrugBank.
-# Este archivo contiene las secuencias de aminoácidos de todas las proteínas que son dianas farmacológicas conocidas. 
-# Cada proteína está identificada por su UniProt ID.
-
 # 1.1 Extracción de UniProt IDs desde el archivo de DrugBank (tiempo de ejecución estimado: <1 segundo)
-# En el siguiente bloque de código extraigo los UniProt IDs de todas las proteínas diana contenidas en el archivo FASTA de DrugBank.
+# Como paso previo, descargo manualmente el archivo drugbank_approved_target_polypeptide_sequences.fasta.zip de DrugBank.
+# El zip contiene dos archivos: protein.fasta y gene.fasta.
+# Solo necesito protein.fasta que contiene las secuencias de aminoácidos de todas las proteínas que son dianas farmacológicas conocidas.
+# Cada proteína está identificada por su UniProt ID.
+zip_path = "drugbank_approved_target_polypeptide_sequences.zip"
 
+# Extraigo el archivo protein.fasta en la carpeta actual
+with zipfile.ZipFile(zip_path, "r") as z:
+    z.extract("protein.fasta")
+
+# Una vez extraído, extraigo los UniProt IDs de todas las proteínas diana contenidas en el archivo FASTA de DrugBank.
 uniprotIDs = [] 
-with open(r"C:\Users\ninad\OneDrive\Escritorio\master bioinfo\TFM\drugbank_targets_protein.fasta", "r") as f:
+with open("protein.fasta", "r") as f:
     for line in f:
         if line.startswith(">"):
             uniprotID = line.split("|")[1].split()[0].strip(";")
             uniprotIDs.append(uniprotID)
 print(f"UniProt IDs encontrados: {len(uniprotIDs)}") 
+
 
 # 1.2 Conversión de UniProt IDs a gene names (tiempo de ejecución estimado: 30 segundos)
 # La base de datos STRING no acepta UniProt IDs directamente, sino que trabaja con nombres de genes.
