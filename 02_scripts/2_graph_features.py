@@ -13,16 +13,18 @@
 # Desde la terminal he instalado los paquetes networkx y pandas
 #   networkx: construccion y analisis de PPIN
 #   pandas: manejo de datos
+#   os: gestión de archivos y rutas del sistema operativo
 # Una vez instalados los paquetes, los cargo en memoria:
 
 import pandas as pd
 import networkx as nx
+import os
 
 # 2.1 Construcción de red PPI
 
 # Cargo los archivos generados previamente 
-edge_df = pd.read_csv(r"..\01_data\edges.csv")
-targets = pd.read_csv(r"..\01_data\targets.csv", header=None)[0].dropna().tolist()
+edge_df = pd.read_csv(r"..\03_results\edges.csv")
+targets = pd.read_csv(r"..\03_results\targets.csv", header=None)[0].dropna().tolist()
 
 # Construyo un grafo no dirigido a partir de la tabla de las interacciones. 
 # Cada fila del archivo edge_df se convierte en una conexión entre dos proteínas.
@@ -78,3 +80,6 @@ n_neg = len(dataset) - n_pos
 print(f"Proteínas en el dataset: {len(dataset)}")
 print(f"Positivos (drug_target=1): {n_pos}")
 print(f"Negativos (drug_target=0): {n_neg}")
+
+# Muevo el archivo final al directorio de resultados
+os.rename("dataset.csv", r"..\03_results\dataset.csv")
