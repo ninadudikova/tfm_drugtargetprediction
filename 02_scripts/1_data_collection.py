@@ -14,9 +14,11 @@
 #   requests: hace llamadas a APIs externas
 #   pandas: manejo de datos
 #   zipfile: extracción de archivos comprimidos
+#   os: gestión de archivos y rutas del sistema operativo
 # Una vez instalados los paquetes, los cargo en memoria:
 
 import zipfile
+import os
 import pandas as pd
 import requests
 import time
@@ -26,7 +28,7 @@ import time
 # El zip contiene dos archivos: protein.fasta y gene.fasta.
 # Solo necesito protein.fasta que contiene las secuencias de aminoácidos de todas las proteínas que son dianas farmacológicas conocidas.
 # Cada proteína está identificada por su UniProt ID.
-zip_path = "drugbank_approved_target_polypeptide_sequences.zip"
+zip_path = "drugbank_approved_target_polypeptide_sequences.fasta.zip"
 
 # Extraigo el archivo protein.fasta en la carpeta actual
 with zipfile.ZipFile(zip_path, "r") as z:
@@ -41,8 +43,11 @@ with open("protein.fasta", "r") as f:
             uniprotIDs.append(uniprotID)
 print(f"UniProt IDs encontrados: {len(uniprotIDs)}") 
 
+#Una vez procesados los archivos, los muevo a carpeta de datos
+os.rename(zip_path, r"..\01_data\drugbank_approved_target_polypeptide_sequences.fasta.zip")
+os.rename("protein.fasta", r"..\01_data\protein.fasta")
 
-# 1.2 Conversión de UniProt IDs a gene names (tiempo de ejecución estimado: 30 segundos)
+# 1.2 Conversión de UniProt IDs a gene names (tiempo de ejecución estimado: 35 segundos)
 # La base de datos STRING no acepta UniProt IDs directamente, sino que trabaja con nombres de genes.
 # Usando la API de UniProt convierto cada UniProt ID a su respectivo gene name. 
 # Como espero que la lista de UniProt IDs sea larga, los IDs se procesan en grupos de 100, evitando hacer una llamada por cada ID. 
@@ -139,5 +144,9 @@ print(f"Total aristas: {len(df_interac_all_prot)}")
 # Guardo todas las interacciones en un archivo .csv
 df_interac_all_prot.to_csv("edges.csv", index=False)
 
-#Guardo la lista de gene names de los targets conocidos de DrugBank en un archivo CSV para usarla como labels positivos
+# Guardo la lista de gene names de los targets conocidos de DrugBank en un archivo CSV para usarla como labels positivos
 pd.Series(list(ID_to_gene.values())).to_csv("targets.csv", index=False, header=False)
+
+# Muevo todos los archivos generados a la carpeta de resultados
+os.rename("edges.csv", r"..\03_results\edges.csv")
+os.rename("targets.csv", r"..\03_results\targets.csv")

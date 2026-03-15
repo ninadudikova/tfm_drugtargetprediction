@@ -20,7 +20,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 # 3.1 Entrenar el modelo Random Forest
 # 3.1.1 Carga del dataset
-dataset = pd.read_csv("dataset.csv")
+dataset = pd.read_csv(r"..\03_results\dataset.csv")
 
 # 3.1.2 Separación de las features del label
 # x = columnas de métricas topológicas que usará el modelo para aprender 

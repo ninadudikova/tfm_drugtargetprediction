@@ -21,8 +21,8 @@ import networkx as nx
 # 2.1 Construcción de red PPI
 
 # Cargo los archivos generados previamente 
-edge_df = pd.read_csv("edges.csv")
-targets = pd.read_csv("targets.csv", header=None)[0].dropna().tolist()
+edge_df = pd.read_csv(r"..\01_data\edges.csv")
+targets = pd.read_csv(r"..\01_data\targets.csv", header=None)[0].dropna().tolist()
 
 # Construyo un grafo no dirigido a partir de la tabla de las interacciones. 
 # Cada fila del archivo edge_df se convierte en una conexión entre dos proteínas.
