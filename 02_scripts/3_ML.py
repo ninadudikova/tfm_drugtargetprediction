@@ -1,26 +1,29 @@
 # TFM: Automatización de la identificación de nuevas dianas farmacológicas mediante redes PPI
 # Elaborado por: Nina Dudikova
-# Fecha: feb 2026
+# Fecha: mar 2026
 
 #3. RANDOM FOREST MACHINE LEARNING
 # Objetivos:
 #   - 3.1 Entrenar el modelo Random Forest
 #   - 3.2 Evaluar el modelo 
+#   - 3.3 Guardar el modelo entrenado
 
 #0. Importación de paquetes
 #Desde la terminal he instalado los paquetes pandas y scikit-learn
 #   pandas: manejo de datos
 #   scikit-learn: librería de machine learning
+#   os: gestión de archivos y rutas del sistema operativo
 # Una vez instalados los paquetes, los cargo en memoria:
 
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
+import os
 
 # 3.1 Entrenar el modelo Random Forest
 # 3.1.1 Carga del dataset
-dataset = pd.read_csv(r"..\03_results\dataset.csv")
+dataset = pd.read_csv("03_results/dataset.csv")
 
 # 3.1.2 Separación de las features del label
 # x = columnas de métricas topológicas que usará el modelo para aprender 
@@ -72,3 +75,10 @@ relevant_features = pd.DataFrame({
     "importance": modelo.feature_importances_
 }).sort_values("importance", ascending=False)
 print(relevant_features)
+
+# 3.3 Guardar el modelo entrenado
+import joblib
+joblib.dump(modelo,"modelo_trained.joblib")
+
+# Muevo el archivo final al directorio de resultados
+os.rename("modelo_trained.joblib", "03_results/modelo.joblib")

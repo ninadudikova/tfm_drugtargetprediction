@@ -43,9 +43,6 @@ with open("protein.fasta", "r") as f:
             uniprotIDs.append(uniprotID)
 print(f"UniProt IDs encontrados: {len(uniprotIDs)}") 
 
-#Una vez procesados los archivos, los muevo a carpeta de datos
-os.rename(zip_path, r"..\01_data\drugbank_approved_target_polypeptide_sequences.fasta.zip")
-os.rename("protein.fasta", r"..\01_data\protein.fasta")
 
 # 1.2 Conversión de UniProt IDs a gene names (tiempo de ejecución estimado: 35 segundos)
 # La base de datos STRING no acepta UniProt IDs directamente, sino que trabaja con nombres de genes.
@@ -147,6 +144,10 @@ df_interac_all_prot.to_csv("edges.csv", index=False)
 # Guardo la lista de gene names de los targets conocidos de DrugBank en un archivo CSV para usarla como labels positivos
 pd.Series(list(ID_to_gene.values())).to_csv("targets.csv", index=False, header=False)
 
-# Muevo todos los archivos generados a la carpeta de resultados
-os.rename("edges.csv", r"..\03_results\edges.csv")
-os.rename("targets.csv", r"..\03_results\targets.csv")
+# Muevo todos los archivos generados al directorio 03_results
+os.rename("edges.csv", "../03_results/edges.csv")
+os.rename("targets.csv", "../03_results/targets.csv")
+
+#Una vez procesados los archivos, los muevo al directorio 01_data
+os.rename(zip_path, "01_data/drugbank_approved_target_polypeptide_sequences.fasta.zip")
+os.rename("protein.fasta", "../01_data/protein.fasta")
