@@ -8,7 +8,9 @@
 #   - 1.2 convertir los UniProt IDs a gene names para poder consultar la base de datos STRING
 #   - 1.3 obtener las PPI para cada target a parir de STRING
 #   - 1.4 construir un archivo .csv con todas las interacciones obtenidas
-
+#
+# Tiempo de ejecución estimado: aproximadamente 45-50 minutos
+#
 # 0. Importación de paquetes
 # Desde la terminal he instalado los paquetes requests y pandas
 #   requests: hace llamadas a APIs externas
@@ -41,6 +43,11 @@ with open("protein.fasta", "r") as f:
         if line.startswith(">"):
             uniprotID = line.split("|")[1].split()[0].strip(";")
             uniprotIDs.append(uniprotID)
+
+# Guardo el resultado en el archivo de texto y lo muestro en la terminal
+with open ("03_results/resultados.txt", "a") as f:
+    f.write("Resultados de data collection: \n")
+    f.write(f"UniProt IDs encontrados: {len(uniprotIDs)}\n")
 print(f"UniProt IDs encontrados: {len(uniprotIDs)}") 
 
 
@@ -90,6 +97,9 @@ for i in range(0, len(uniprotIDs), batch_size):
                 ID_to_gene[u_ID] = gene_name
     time.sleep(0.3)
 
+# Guardo el resultado en el archivo de texto y lo muestro en la terminal
+with open ("03_results/resultados.txt", "a") as f:
+    f.write(f"Gene names obtenidos: {len(ID_to_gene)}\n")
 print(f"Gene names obtenidos: {len(ID_to_gene)}")
 
 # 1.3 Descarga de interacciones PPI desde STRING (tiempo de ejecución estimado: aprox. 45 minutos)
@@ -134,8 +144,12 @@ for gene in ID_to_gene.values():
 
 # 1.4 Construcción de un archivo .csv con todas las interacciones obtenidas
 # Uno todos los dataframes de interacciones en uno solo, eliminando las filas repetidas
-
 df_interac_all_prot = pd.concat(all_interac, ignore_index=True).drop_duplicates()
+
+# Guardo el resultado en el archivo de texto y lo muestro en la terminal
+with open ("03_results/resultados.txt", "a") as f:
+    f.write(f"Total aristas: {len(df_interac_all_prot)}\n")
+    f.write("-" * 40 + "\n")
 print(f"Total aristas: {len(df_interac_all_prot)}")
 
 # Guardo todas las interacciones en un archivo .csv
@@ -145,9 +159,9 @@ df_interac_all_prot.to_csv("edges.csv", index=False)
 pd.Series(list(ID_to_gene.values())).to_csv("targets.csv", index=False, header=False)
 
 # Muevo todos los archivos generados al directorio 03_results
-os.rename("edges.csv", "../03_results/edges.csv")
-os.rename("targets.csv", "../03_results/targets.csv")
+os.rename("edges.csv", "03_results/edges.csv")
+os.rename("targets.csv", "03_results/targets.csv")
 
 #Una vez procesados los archivos, los muevo al directorio 01_data
 os.rename(zip_path, "01_data/drugbank_approved_target_polypeptide_sequences.fasta.zip")
-os.rename("protein.fasta", "../01_data/protein.fasta")
+os.rename("protein.fasta", "01_data/protein.fasta")
