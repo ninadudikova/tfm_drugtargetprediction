@@ -8,7 +8,6 @@ Proteínas en el dataset: 10084
 Positivos (drug_target=1): 2352
 Negativos (drug_target=0): 7732
 ----------------------------------------
-
 Resultados de entrenamiento del modelo:
               precision    recall  f1-score   support
 
@@ -21,18 +20,21 @@ weighted avg       0.82      0.83      0.82      2017
 
 [[1441  105]
  [ 238  233]]
+Especificidad: 0.9321
+
                   feature  importance
 2  betweenness_centrality    0.294441
 1  clustering_coefficient    0.220829
 4                pagerank    0.194498
 3    closeness_centrality    0.172264
 0                  degree    0.117967
+
 AUC: 0.8379
 Average Precision: 0.6346
 ----------------------------------------
 Resultados de la validación del modelo:
 F1 promedio:            0.5456
-Precision promedio:     0.6491
-Recall promedio:        0.4707
-Desviacion estandar F1: 0.0139
+Precisión promedio:     0.6491
+Sensibilidad promedio:        0.4707
+Desviación estándar F1: 0.0139
 ----------------------------------------

@@ -61,11 +61,16 @@ modelo.fit(X_train, y_train)
 # 3.2 Evalucación del modelo
 # 3.2.1 Generación de las predicciones usando el test set
 y_pred = modelo.predict(X_test)
+# 3.2.2 Cálculo de la probablidad de cada proteína de ser una diana molecular.
+#   [:, 1] selecciona la probabilidad de todas las proteínas de ser drug_target (columna 1).
+#   predict_proba devuelve la probabilidad de cada proteína de ser drug target.
+y_prob = modelo.predict_proba(X_test)[:, 1]
 
-# 3.2.2 Comparación de las predicciones calculando las métricas:
-#   - precision: mide la fiabilidad de las predicciones postivas, es la proporción de proteínas predichas como drug target que realmente lo son
-#   - recall: mide la capacidad de del modelo para no perder casos positivos, proporción de drug targets reales que el modelo ha sido capaz de identificar
-#   - f1-score: es la media harmónica de precision y recall
+# 3.2.3 Cuantificación de las predicciones calculando las métricas:
+#   - exactitud: mide la proporción de predicciones correctas sobre el total de casos
+#   - precisión: mide la fiabilidad de las predicciones postivas, es la proporción de proteínas predichas como drug target que realmente lo son
+#   - sensibilidad: mide la capacidad de del modelo para no perder casos positivos, proporción de drug targets reales que el modelo ha sido capaz de identificar
+#   - F1-score: es la media harmónica de precision y recall
 # Imprimo el informe de clasificación para evaluar el rendimiento del modelo en el test set.
 metrics = classification_report(y_test, y_pred)
 
@@ -75,7 +80,7 @@ with open("03_results/resultados.txt", "a") as f:
     f.write(metrics + "\n")
 print(metrics)
 
-# 3.2.3 Generación de la matriz de confusión
+# 3.2.4 Generación de la matriz de confusión
 # Genera una tabla que muestra cuántos casos el modelo clasificó correcta e incorrectamente
 conf_matrix = confusion_matrix(y_test, y_pred)
 
@@ -84,7 +89,17 @@ with open("03_results/resultados.txt", "a") as f:
     f.write(str(conf_matrix) + "\n")
 print(conf_matrix)
 
-# 3.2.4 Evaluación de la importancia de las features para hacer las predicciones
+# Cálculo de la especificidad a partir de la matriz de confusión
+TN = conf_matrix[0][0]
+FP = conf_matrix[0][1]
+specificity = TN / (TN + FP)
+
+# Guardo el resultado en el archivo de texto y lo muestro en la terminal
+with open("03_results/resultados.txt", "a") as f:
+    f.write(f"Especificidad: {specificity:.4f}\n\n")
+print(f"Especificidad: {specificity:.4f}")
+
+# 3.2.5 Evaluación de la importancia de las features para hacer las predicciones
 relevant_features = pd.DataFrame({
     "feature":X.columns,
     "importance": modelo.feature_importances_
@@ -94,12 +109,6 @@ relevant_features = pd.DataFrame({
 with open("03_results/resultados.txt", "a") as f:
     f.write(relevant_features.to_string() + "\n")
 print(relevant_features)
-
-# 3.2.5 Cálculo de la probablidad de cada proteína de ser una diana molecular.
-#   [:, 1] selecciona la probabilidad de todas las proteínas de ser drug_target (columna 1).
-#   predict_proba devuelve la probabilidad de cada proteína de ser drug target.
-
-y_prob = modelo.predict_proba(X_test)[:, 1]
 
 # 3.2.6 Cálculo de AUC
 # AUC (área bajo la curva) representa la probabilidad de que el modelo, si se le da un ejemplo positivo y negativo 
@@ -130,14 +139,14 @@ plt.legend()
 plt.savefig("03_results/curva_roc.png")
 plt.show()
 
-# 3.2.9 Curva precision-recall (PR) y el average precision.
-#  3.2.9.1 Cálculo de los valores de precision y recall
+# 3.2.8 Curva precision-recall (PR) y el average precision.
+#  3.2.8.1 Cálculo de los valores de precision y recall
 #   precision: el ratio de clasificaciones correctas de nuestro clasificador (true + false positive)
 #   recall: l ratio de positivos detectado en el dataset por nuestro clasificador (true positive + false negative)
 #   _ descarta el valor de theresholds que no se va a usar para dibujar la curva
 precision, recall, _ = precision_recall_curve(y_test, y_prob)
 
-# 3.2.9.2 Cálculo de average precision.
+# 3.2.8.2 Cálculo de average precision.
 #   average precision: el área bajo la curva PR.
 ap = average_precision_score(y_test, y_prob)
 with open("03_results/resultados.txt", "a") as f:
@@ -145,12 +154,12 @@ with open("03_results/resultados.txt", "a") as f:
     f.write("-" * 40 + "\n")
 print(f"Average Precision: {ap:.4f}")
 
-# 3.2.9.3 Generación del gráfico de la curva PR
+# 3.2.8.3 Generación del gráfico de la curva PR
 plt.figure()
 plt.plot(recall, precision, label=f"AP = {ap:.4f}")
-plt.xlabel("Recall")
+plt.xlabel("Sensibilidad (Recall)")
 plt.ylabel("Precision")
-plt.title("Curva Precisión-Recall - Random Forest")
+plt.title("Curva Precisión-Sensibilidad - Random Forest")
 plt.legend()
 plt.savefig("03_results/curva_precision_recall.png")
 plt.show()
